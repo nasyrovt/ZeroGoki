@@ -16,6 +16,8 @@ public:
 
 	virtual void Tick(float DeltaSeconds) override;
 
+	void WeaponCooling(float DeltaSeconds);
+
 	/** Property replication */
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
@@ -73,6 +75,8 @@ protected:
 
 	/** Response to health being updated. Called on the server immediately after modification, and on clients in response to a RepNotify*/
 	void OnHealthUpdate();
+
+	void Respawn();
 
 	/** Called for forwards/backward input */
 	UFUNCTION(BlueprintCallable, Category = "Movement")

@@ -68,10 +68,17 @@ void AZeroGokiTestCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
+	//Cooling weapon with time
+	WeaponCooling(DeltaSeconds);
+
+
+}
+
+void AZeroGokiTestCharacter::WeaponCooling(float DeltaSeconds)
+{
 	WeaponHeatLevel -= DeltaSeconds * WeaponChillingMultiplier;
 	if (WeaponHeatLevel <= 0) WeaponHeatLevel = 0;
 }
-
 
 //////////////////////////////////////////////////////////////////////////
 // Input
@@ -116,9 +123,9 @@ void AZeroGokiTestCharacter::OnHealthUpdate()
 		FString healthMessage = FString::Printf(TEXT("You now have %f health remaining."), CurrentHealth);
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, healthMessage);
 
-		if (CurrentHealth <= 0)
+		if (CurrentHealth <= 0.f)
 		{
-			FString deathMessage = FString::Printf(TEXT("You have been killed."));
+			FString deathMessage = FString::Printf(TEXT("You have been killed. You will respawn in 5 seconds."));
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, deathMessage);
 		}
 	}
@@ -131,9 +138,21 @@ void AZeroGokiTestCharacter::OnHealthUpdate()
 	}
 
 	//Functions that occur on all machines. 
-	if (CurrentHealth <= 0) {
-		this->Destroy();
+	if (CurrentHealth <= 0.f) {
+		Respawn(); //TODO: Move to Client-only logic when building a project
 	}
+}
+
+void AZeroGokiTestCharacter::Respawn()
+{
+	this->SetActorHiddenInGame(true);
+	this->CurrentHealth = MaxHealth;
+
+	float randomMultiplier = FMath::FRandRange(8000.f, 10000.f);
+	FVector newPosition = FMath::VRand() * randomMultiplier;
+
+	this->SetActorLocation(newPosition);
+	this->SetActorHiddenInGame(false);
 }
 
 
@@ -181,7 +200,7 @@ void AZeroGokiTestCharacter::MoveForward(float Value)
 
 		//// get forward vector
 		//const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-		///*UE_LOG(LogTemp, Warning, TEXT(Controller->GetName()));*/
+		
 		AddMovementInput(GetActorForwardVector(), Value);
 	}
 }

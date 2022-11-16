@@ -49,16 +49,16 @@ public:
 
 protected:
 
-	UPROPERTY(EditDefaultsOnly, Category = "Combat")
+	UPROPERTY(EditAnywhere, Category = "Combat")
 		float WeaponHeatLimit;
 
-	UPROPERTY(VisibleAnywhere, Category = "Combat")
+	UPROPERTY(EditAnywhere, Category = "Combat")
 		float CurrentWeaponHeatAmount;
 
-	UPROPERTY(VisibleAnywhere, Category = "Combat")
+	UPROPERTY(EditAnywhere, Category = "Combat")
 		float WeaponHeatLevel;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Combat")
+	UPROPERTY(EditAnywhere, Category = "Combat")
 		float WeaponChillingMultiplier;
 
 	/** The player's maximum health. This is the highest that their health can be, and the value that their health starts at when spawned.*/

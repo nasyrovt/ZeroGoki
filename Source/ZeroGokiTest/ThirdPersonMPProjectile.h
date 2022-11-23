@@ -31,6 +31,10 @@ public:
     UPROPERTY(EditAnywhere, Category = "Effects")
         class UParticleSystem* ExplosionEffect;
 
+    // Particle VFX for projectile
+    UPROPERTY(EditAnywhere, Category = "Effects")
+        class UParticleSystem* ProjectileEffect;
+
     //The damage type and damage that will be done by this projectile
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Damage")
         TSubclassOf<class UDamageType> DamageType;

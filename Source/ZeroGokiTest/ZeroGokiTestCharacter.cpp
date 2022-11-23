@@ -120,21 +120,21 @@ void AZeroGokiTestCharacter::OnHealthUpdate()
 	//Client-specific functionality
 	if (IsLocallyControlled())
 	{
-		FString healthMessage = FString::Printf(TEXT("You now have %f health remaining."), CurrentHealth);
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, healthMessage);
+		/*FString healthMessage = FString::Printf(TEXT("You now have %f health remaining."), CurrentHealth);
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, healthMessage);*/
 
 		if (CurrentHealth <= 0.f)
 		{
-			FString deathMessage = FString::Printf(TEXT("You have been killed. You will respawn in 5 seconds."));
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, deathMessage);
+			/*FString deathMessage = FString::Printf(TEXT("You have been killed. You will respawn in 5 seconds."));
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, deathMessage);*/
 		}
 	}
 
 	//Server-specific functionality
 	if (GetLocalRole() == ROLE_Authority)
 	{
-		FString healthMessage = FString::Printf(TEXT("%s now has %f health remaining."), *GetFName().ToString(), CurrentHealth);
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, healthMessage);
+		/*FString healthMessage = FString::Printf(TEXT("%s now has %f health remaining."), *GetFName().ToString(), CurrentHealth);
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, healthMessage);*/
 	}
 
 	//Functions that occur on all machines. 
@@ -194,13 +194,6 @@ void AZeroGokiTestCharacter::MoveForward(float Value)
 {
 	if ((Controller != nullptr) && (Value != 0.0f))
 	{
-		// find out which way is forward
-		//const FRotator Rotation = Controller->GetControlRotation();
-		//const FRotator YawRotation(0, Rotation.Yaw, 0);
-
-		//// get forward vector
-		//const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-
 		AddMovementInput(GetActorForwardVector(), Value);
 	}
 }
@@ -242,6 +235,9 @@ void AZeroGokiTestCharacter::HandleFire_Implementation()
 	//Can't shoot if the projectile will overheat a weapon
 	if (!(WeaponHeatLevel + CurrentWeaponHeatAmount <= WeaponHeatLimit)) return;
 
+	FString healthMessage = FString::Printf(TEXT("You now have %f  ."), WeaponHeatLevel);
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, healthMessage);
+
 	//Get Spawn Properties
 	FVector spawnLocation = GetActorLocation() + (GetActorRotation().Vector() * SpawnDirectionMultiplier) + (GetActorUpVector() * SpawnUpVectorMultiplier);
 	FRotator spawnRotation = GetActorRotation();
@@ -256,4 +252,5 @@ void AZeroGokiTestCharacter::HandleFire_Implementation()
 	//Increase heat amount on the weapon
 	CurrentWeaponHeatAmount = spawnedProjectile->ProjectileHeatAmount;
 	WeaponHeatLevel += CurrentWeaponHeatAmount;
+
 }

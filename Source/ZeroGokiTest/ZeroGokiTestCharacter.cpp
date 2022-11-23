@@ -31,7 +31,7 @@ AZeroGokiTestCharacter::AZeroGokiTestCharacter()
 	WeaponHeatLevel = 0.f;
 	WeaponChillingMultiplier = 5.f;
 	// Default value for first projectile
-	CurrentWeaponHeatAmount = 5.f; 
+	CurrentWeaponHeatAmount = 5.f;
 
 	// Don't rotate when the controller rotates. Let that just affect the camera.
 	bUseControllerRotationPitch = true;
@@ -87,7 +87,7 @@ void AZeroGokiTestCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 {
 	// Set up gameplay key bindings
 	check(PlayerInputComponent);
-	
+
 	//PlayerInput Bindings (Currently implemented in BP)
 	/*PlayerInputComponent->BindAxis("Move Forward / Backward", this, &AZeroGokiTestCharacter::MoveForward);*/
 	/*PlayerInputComponent->BindAxis("Move Right / Left", this, &AZeroGokiTestCharacter::MoveRight);*/
@@ -95,9 +95,9 @@ void AZeroGokiTestCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 	// We have 2 versions of the rotation bindings to handle different kinds of devices differently
 	// "turn" handles devices that provide an absolute delta, such as a mouse.
 	// "turnrate" is for devices that we choose to treat as a rate of change, such as an analog joystick
-	
+
 	/*PlayerInputComponent->BindAxis("Turn Right / Left Gamepad", this, &AZeroGokiTestCharacter::TurnAtRate);
-	
+
 	PlayerInputComponent->BindAxis("Look Up / Down Gamepad", this, &AZeroGokiTestCharacter::LookUpAtRate);*/
 
 	// Handle firing projectiles
@@ -200,22 +200,22 @@ void AZeroGokiTestCharacter::MoveForward(float Value)
 
 		//// get forward vector
 		//const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-		
+
 		AddMovementInput(GetActorForwardVector(), Value);
 	}
 }
 
 void AZeroGokiTestCharacter::MoveRight(float Value)
 {
-	if ( (Controller != nullptr) && (Value != 0.0f) )
+	if ((Controller != nullptr) && (Value != 0.0f))
 	{
 		// find out which way is right
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
-	
+
 		// get right vector 
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-		
+
 		// add movement in that direction
 		AddMovementInput(Direction, Value);
 	}
@@ -239,12 +239,12 @@ void AZeroGokiTestCharacter::StopFire()
 
 void AZeroGokiTestCharacter::HandleFire_Implementation()
 {
-	//Return if the projectile will overheat a weapon
+	//Can't shoot if the projectile will overheat a weapon
 	if (!(WeaponHeatLevel + CurrentWeaponHeatAmount <= WeaponHeatLimit)) return;
 
 	//Get Spawn Properties
 	FVector spawnLocation = GetActorLocation() + (GetActorRotation().Vector() * SpawnDirectionMultiplier) + (GetActorUpVector() * SpawnUpVectorMultiplier);
-	FRotator spawnRotation =  GetActorRotation();
+	FRotator spawnRotation = GetActorRotation();
 
 	FActorSpawnParameters spawnParameters;
 	spawnParameters.Instigator = GetInstigator();

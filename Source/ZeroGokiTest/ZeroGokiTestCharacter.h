@@ -49,22 +49,22 @@ public:
 
 protected:
 
-	UPROPERTY(EditAnywhere, Category = "Combat")
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, Category = "Combat")
 		float WeaponHeatLimit;
 
-	UPROPERTY(EditAnywhere, Category = "Combat")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Combat")
 		float CurrentWeaponHeatAmount;
 
-	UPROPERTY(EditAnywhere, Category = "Combat")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Combat")
 		float WeaponHeatLevel;
 
-	UPROPERTY(EditAnywhere, Category = "Combat")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Combat")
 		float WeaponChillingMultiplier;
 
 	/** The player's maximum health. This is the highest that their health can be, and the value that their health starts at when spawned.*/
 	UPROPERTY(EditDefaultsOnly, Category = "Health")
 		float MaxHealth;
-
+	
 	/** The player's current health. When reduced to 0, they are considered dead.*/
 	UPROPERTY(ReplicatedUsing = OnRep_CurrentHealth)
 		float CurrentHealth;

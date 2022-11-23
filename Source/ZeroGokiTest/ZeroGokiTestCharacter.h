@@ -39,6 +39,14 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Health")
 		FORCEINLINE float GetCurrentHealth() const { return CurrentHealth; }
 
+	/** Getter for Max Heat Limit.*/
+	UFUNCTION(BlueprintPure, Category = "Combat")
+		FORCEINLINE float GetHeatLimit() const { return WeaponHeatLimit; }
+
+	/** Getter for Current Heat.*/
+	UFUNCTION(BlueprintPure, Category = "Combat")
+		FORCEINLINE float GetCurrentHeat() const { return WeaponHeatLevel; }
+
 	/** Setter for Current Health. Clamps the value between 0 and MaxHealth and calls OnHealthUpdate. Should only be called on the server.*/
 	UFUNCTION(BlueprintCallable, Category = "Health")
 		void SetCurrentHealth(float healthValue);
@@ -49,16 +57,16 @@ public:
 
 protected:
 
-	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, Category = "Combat")
+	UPROPERTY(EditAnywhere, Category = "Combat")
 		float WeaponHeatLimit;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Combat")
+	UPROPERTY(EditAnywhere, Category = "Combat")
 		float CurrentWeaponHeatAmount;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Combat")
+	UPROPERTY(EditAnywhere, Category = "Combat")
 		float WeaponHeatLevel;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Combat")
+	UPROPERTY(EditAnywhere, Category = "Combat")
 		float WeaponChillingMultiplier;
 
 	/** The player's maximum health. This is the highest that their health can be, and the value that their health starts at when spawned.*/

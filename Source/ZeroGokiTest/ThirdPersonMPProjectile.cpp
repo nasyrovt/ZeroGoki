@@ -36,6 +36,7 @@ AThirdPersonMPProjectile::AThirdPersonMPProjectile()
 	//Definition for the Mesh that will serve as your visual representation.
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> DefaultMesh(TEXT("/Game/StarterContent/Shapes/Shape_Sphere.Shape_Sphere"));
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
+	//1ere idée : ajouter ici le niagara system (ne pas oubliez de include)
 	StaticMesh->SetupAttachment(RootComponent);
 
 	//Set the Static Mesh and its position/scale if you successfully found a mesh asset to use.
@@ -62,7 +63,7 @@ AThirdPersonMPProjectile::AThirdPersonMPProjectile()
 	ProjectileMovementComponent->ProjectileGravityScale = 0.0f;
 
 	DamageType = UDamageType::StaticClass();
-	Damage = 10.0f;
+	Damage = 0.0f;
 
 	ProjectileHeatAmount = 10.f;
 
@@ -88,13 +89,13 @@ void AThirdPersonMPProjectile::Destroyed()
 	UGameplayStatics::SpawnEmitterAtLocation(this, ExplosionEffect, spawnLocation, FRotator::ZeroRotator, true, EPSCPoolMethod::AutoRelease);
 }
 
-void AThirdPersonMPProjectile::OnProjectileImpact(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
-{
-	if (OtherActor)
-	{
-		UGameplayStatics::ApplyPointDamage(OtherActor, Damage, NormalImpulse, Hit, GetInstigator()->Controller, this, DamageType);
-	}
-
-	Destroy();
-}
+//void AThirdPersonMPProjectile::OnProjectileImpact(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+//{
+//	if (OtherActor)
+//	{
+//		UGameplayStatics::ApplyPointDamage(OtherActor, Damage, NormalImpulse, Hit, GetInstigator()->Controller, this, DamageType);
+//	}
+//
+//	Destroy();
+//}
 

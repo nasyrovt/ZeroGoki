@@ -39,6 +39,14 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Health")
 		FORCEINLINE float GetCurrentHealth() const { return CurrentHealth; }
 
+	/** Getter for Max Shield.*/
+	UFUNCTION(BlueprintPure, Category = "Shield")
+		FORCEINLINE float GetMaxShield() const { return MaxShield; }
+
+	/** Getter for Current Shield.*/
+	UFUNCTION(BlueprintPure, Category = "Shield")
+		FORCEINLINE float GetCurrentShield() const { return CurrentShield; }
+
 	/** Getter for Max Heat Limit.*/
 	UFUNCTION(BlueprintPure, Category = "Combat")
 		FORCEINLINE float GetHeatLimit() const { return WeaponHeatLimit; }
@@ -50,6 +58,9 @@ public:
 	/** Setter for Current Health. Clamps the value between 0 and MaxHealth and calls OnHealthUpdate. Should only be called on the server.*/
 	UFUNCTION(BlueprintCallable, Category = "Health")
 		void SetCurrentHealth(float healthValue);
+
+	UFUNCTION(BlueprintCallable, Category = "Shield")
+		void SetCurrentShield(float shieldValue);
 
 	/** Event for taking damage. Overridden from APawn.*/
 	UFUNCTION(BlueprintCallable, Category = "Health")
@@ -72,17 +83,28 @@ protected:
 	/** The player's maximum health. This is the highest that their health can be, and the value that their health starts at when spawned.*/
 	UPROPERTY(EditDefaultsOnly, Category = "Health")
 		float MaxHealth;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Shield")
+		float MaxShield;
 	
 	/** The player's current health. When reduced to 0, they are considered dead.*/
 	UPROPERTY(ReplicatedUsing = OnRep_CurrentHealth)
 		float CurrentHealth;
 
+	UPROPERTY(ReplicatedUsing = OnRep_CurrentShield)
+		float CurrentShield;
+
 	/** RepNotify for changes made to current health.*/
 	UFUNCTION()
 		void OnRep_CurrentHealth();
 
+	UFUNCTION()
+		void OnRep_CurrentShield();
+
 	/** Response to health being updated. Called on the server immediately after modification, and on clients in response to a RepNotify*/
 	void OnHealthUpdate();
+
+	void OnShieldUpdate();
 
 	void Respawn();
 
@@ -114,6 +136,9 @@ protected:
 
 	/** If true, you are in the process of firing projectiles. */
 	bool bIsFiringWeapon;
+
+	/** If true, Weapon is overheating so you can't fire until CurrentHeat back to 0*/
+	bool IsWeaponMaxHeat;
 
 	/** Function for beginning weapon fire.*/
 	UFUNCTION(BlueprintCallable, Category = "Gameplay")

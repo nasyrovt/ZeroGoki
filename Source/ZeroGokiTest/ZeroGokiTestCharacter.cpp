@@ -29,9 +29,9 @@ AZeroGokiTestCharacter::AZeroGokiTestCharacter()
 	//Weapon heat init
 	WeaponHeatLimit = 100.f;
 	WeaponHeatLevel = 0.f;
-	WeaponChillingMultiplier = 5.f;
+	WeaponChillingMultiplier = 10.f;
 	// Default value for first projectile
-	CurrentWeaponHeatAmount = 5.f;
+	CurrentWeaponHeatAmount = 10.f;
 
 	// Don't rotate when the controller rotates. Let that just affect the camera.
 	bUseControllerRotationPitch = true;
@@ -57,11 +57,16 @@ AZeroGokiTestCharacter::AZeroGokiTestCharacter()
 	MaxHealth = 100.0f;
 	CurrentHealth = MaxHealth;
 
+	//Initialize player's shield
+	MaxShield = 50.0f;
+	CurrentShield = MaxShield;
+
 	//Initialize projectile class
 	ProjectileClass = AThirdPersonMPProjectile::StaticClass();
 	//Initialize fire rate
 	FireRate = 0.25f;
 	bIsFiringWeapon = false;
+	IsWeaponMaxHeat = false;
 }
 
 void AZeroGokiTestCharacter::Tick(float DeltaSeconds)
@@ -143,13 +148,23 @@ void AZeroGokiTestCharacter::OnHealthUpdate()
 	}
 }
 
+
+void AZeroGokiTestCharacter::OnShieldUpdate()
+{
+
+ 
+	if (CurrentShield <= 0.f) {
+		//enlever le materiel du shield
+	}
+}
+
 void AZeroGokiTestCharacter::Respawn()
 {
 	this->SetActorHiddenInGame(true);
 	this->CurrentHealth = MaxHealth;
 
 	float randomMultiplier = FMath::FRandRange(8000.f, 10000.f);
-	FVector newPosition = FMath::VRand() * randomMultiplier;
+	FVector newPosition = FMath::VRand() * randomMultiplier; //modifier respawn rajouter vecteur offset hauteur
 
 	this->SetActorLocation(newPosition);
 	this->SetActorHiddenInGame(false);
@@ -161,6 +176,11 @@ void AZeroGokiTestCharacter::OnRep_CurrentHealth()
 	OnHealthUpdate();
 }
 
+void AZeroGokiTestCharacter::OnRep_CurrentShield()
+{
+	OnShieldUpdate();
+}
+
 void AZeroGokiTestCharacter::SetCurrentHealth(float healthValue)
 {
 	if (GetLocalRole() == ROLE_Authority)
@@ -170,10 +190,25 @@ void AZeroGokiTestCharacter::SetCurrentHealth(float healthValue)
 	}
 }
 
+void AZeroGokiTestCharacter::SetCurrentShield(float shieldValue)
+{
+	if (GetLocalRole() == ROLE_Authority)
+	{
+		CurrentShield = FMath::Clamp(shieldValue, 0.f, MaxShield);
+		OnShieldUpdate();
+	}
+}
+
 float AZeroGokiTestCharacter::TakeDamage(float DamageTaken, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+	float damageAppliedS = CurrentShield - DamageTaken;
 	float damageApplied = CurrentHealth - DamageTaken;
-	SetCurrentHealth(damageApplied);
+	if (CurrentShield > 0) {
+		SetCurrentShield(damageAppliedS);
+	}
+	else {
+		SetCurrentHealth(damageApplied);
+	}
 	return damageApplied;
 }
 
@@ -230,27 +265,46 @@ void AZeroGokiTestCharacter::StopFire()
 	bIsFiringWeapon = false;
 }
 
+
 void AZeroGokiTestCharacter::HandleFire_Implementation()
 {
 	//Can't shoot if the projectile will overheat a weapon
-	if (!(WeaponHeatLevel + CurrentWeaponHeatAmount <= WeaponHeatLimit)) return;
+	if (!(WeaponHeatLevel + CurrentWeaponHeatAmount <= WeaponHeatLimit))
+	{
+		StopFire();
+		IsWeaponMaxHeat = true;
+		
+		WeaponChillingMultiplier = 50.f;
+		//CurrentWeaponHeatAmount = 50.f;
+		//return;
+	}
+	if (IsWeaponMaxHeat == false) {
+		FString healthMessage = FString::Printf(TEXT("test You now have %f  ."), WeaponHeatLevel);
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, healthMessage);
 
-	FString healthMessage = FString::Printf(TEXT("You now have %f  ."), WeaponHeatLevel);
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, healthMessage);
+		//Get Spawn Properties
+		FVector spawnLocation = GetActorLocation() + (GetActorRotation().Vector() * SpawnDirectionMultiplier) + (GetActorUpVector() * SpawnUpVectorMultiplier);
+		FRotator spawnRotation = GetActorRotation();
 
-	//Get Spawn Properties
-	FVector spawnLocation = GetActorLocation() + (GetActorRotation().Vector() * SpawnDirectionMultiplier) + (GetActorUpVector() * SpawnUpVectorMultiplier);
-	FRotator spawnRotation = GetActorRotation();
+		FActorSpawnParameters spawnParameters;
+		spawnParameters.Instigator = GetInstigator();
+		spawnParameters.Owner = this;
 
-	FActorSpawnParameters spawnParameters;
-	spawnParameters.Instigator = GetInstigator();
-	spawnParameters.Owner = this;
+		//Spawn Projectile Object
+		AThirdPersonMPProjectile* spawnedProjectile = GetWorld()->SpawnActor<AThirdPersonMPProjectile>(spawnLocation, spawnRotation, spawnParameters); //2ème idée : faire spawn ici le blueprint avec le laser
 
-	//Spawn Projectile Object
-	AThirdPersonMPProjectile* spawnedProjectile = GetWorld()->SpawnActor<AThirdPersonMPProjectile>(spawnLocation, spawnRotation, spawnParameters);
-
-	//Increase heat amount on the weapon
-	CurrentWeaponHeatAmount = spawnedProjectile->ProjectileHeatAmount;
-	WeaponHeatLevel += CurrentWeaponHeatAmount;
+		//Increase heat amount on the weapon
+		CurrentWeaponHeatAmount = spawnedProjectile->ProjectileHeatAmount;
+		WeaponHeatLevel += CurrentWeaponHeatAmount;
+	}else if(IsWeaponMaxHeat == true){
+		FString healthMessage = FString::Printf(TEXT("Normalement tu peux plus tirer , You now have %f  ."), WeaponHeatLevel);
+	}
+	
+	if (WeaponHeatLevel <= 0) {
+		WeaponChillingMultiplier = 10.f;
+		//CurrentWeaponHeatAmount = 10.f;
+		IsWeaponMaxHeat = false;
+	}
+	
 
 }

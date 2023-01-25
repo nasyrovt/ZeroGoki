@@ -118,6 +118,7 @@ void AZeroGokiTestCharacter::GetLifetimeReplicatedProps(TArray <FLifetimePropert
 
 	//Replicate current health.
 	DOREPLIFETIME(AZeroGokiTestCharacter, CurrentHealth);
+	DOREPLIFETIME(AZeroGokiTestCharacter, CurrentShield);
 }
 
 void AZeroGokiTestCharacter::OnHealthUpdate()

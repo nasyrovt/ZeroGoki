@@ -82,4 +82,14 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	void SetCameraComponent(UCameraComponent* CameraComponent);
+
+#pragma region Combat
+
+	UFUNCTION(BlueprintCallable, Category = "Combat")
+		FORCEINLINE float GetCurrentHeat() const { return CurrentWeaponHeatAmount; }
+
+	UFUNCTION(BlueprintCallable, Category = "Combat")
+		FORCEINLINE float GetMaxHeat() const { return WeaponHeatLimit; }
+
+#pragma endregion
 };

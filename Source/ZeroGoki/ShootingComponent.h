@@ -8,13 +8,18 @@
 
 #include "ShootingComponent.generated.h"
 
+UENUM() enum FireMode
+{
+	Rafale     UMETA(DisplayName = "Rafale"),
+	SemiAuto   UMETA(DisplayName = "SemiAuto")
+};
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class ZEROGOKI_API UShootingComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:	
+public:
 	// Sets default values for this component's properties
 	UShootingComponent();
 
@@ -26,9 +31,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Shooting")
 		void StopFire();
 
+	void HandleFireRafale_Implementation();
+
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+		TEnumAsByte<FireMode> mode;
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
 		float WeaponHeatLimit;
@@ -52,18 +63,23 @@ protected:
 	/** If true, you are in the process of firing projectiles. */
 	bool bIsFiringWeapon;
 
+	int nbProjectile;
+
 	class UCameraComponent* CameraComp;
 
 	/** Server function for spawning projectiles.*/
 	UFUNCTION(Server, Reliable)
 		void HandleFire();
 
+	UFUNCTION(Server, Reliable)
+		void HandleFireRafale();
+
 	/** A timer handle used for providing the fire rate delay in-between spawns.*/
 	FTimerHandle FiringTimer;
 
-public:	
+public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	
+
 	void SetCameraComponent(UCameraComponent* CameraComponent);
 };

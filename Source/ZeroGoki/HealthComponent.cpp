@@ -22,7 +22,7 @@ void UHealthComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
-	
+
 }
 
 
@@ -47,21 +47,17 @@ void UHealthComponent::OnHealthUpdate()
 	//Client-specific functionality
 	if (Cast<APawn>(GetOwner())->IsLocallyControlled())
 	{
-		FString healthMessage = FString::Printf(TEXT("You now have %f health remaining."), CurrentHealth);
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, healthMessage);
-
+		
 		if (CurrentHealth <= 0)
 		{
-			FString deathMessage = FString::Printf(TEXT("You have been killed."));
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, deathMessage);
+			
 		}
 	}
 
 	//Server-specific functionality
 	if (GetOwner()->GetLocalRole() == ROLE_Authority)
 	{
-		FString healthMessage = FString::Printf(TEXT("%s now has %f health remaining."), *GetFName().ToString(), CurrentHealth);
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, healthMessage);
+	
 	}
 
 	//Functions that occur on all machines. 
@@ -78,11 +74,8 @@ void UHealthComponent::OnRep_CurrentHealth()
 
 void UHealthComponent::SetCurrentHealth(float healthValue)
 {
-	if (GetOwner()->GetLocalRole() == ROLE_Authority)
-	{
-		CurrentHealth = FMath::Clamp(healthValue, 0.f, MaxHealth);
-		OnHealthUpdate();
-	}
+	CurrentHealth = FMath::Clamp(healthValue, 0.f, MaxHealth);
+	OnHealthUpdate();
 }
 
 void UHealthComponent::OnShieldUpdate()

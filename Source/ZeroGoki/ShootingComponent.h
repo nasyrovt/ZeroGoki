@@ -53,6 +53,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Combat")
 		float WeaponChillingMultiplier;
 
+	UPROPERTY(EditAnywhere, Category = "Combat")
+		float WeaponChillingDelay;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
 		TSubclassOf<AProjectileBase> ProjectileClass;
 
@@ -81,12 +84,16 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	void WeaponChillDown();
+
+	void RestartChillingWeapon();
+
 	void SetCameraComponent(UCameraComponent* CameraComponent);
 
 #pragma region Combat
 
 	UFUNCTION(BlueprintCallable, Category = "Combat")
-		FORCEINLINE float GetCurrentHeat() const { return CurrentWeaponHeatAmount; }
+		FORCEINLINE float GetCurrentHeat() const { return WeaponHeatLevel; }
 
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 		FORCEINLINE float GetMaxHeat() const { return WeaponHeatLimit; }

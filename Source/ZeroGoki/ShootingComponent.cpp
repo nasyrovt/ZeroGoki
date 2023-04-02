@@ -27,7 +27,6 @@ void UShootingComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
-
 }
 
 
@@ -36,8 +35,28 @@ void UShootingComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
+	WeaponChillDown();
 }
+
+void UShootingComponent::WeaponChillDown()
+{
+	if (WeaponHeatLevel == WeaponHeatLimit)
+	{
+		FTimerHandle ChillingTimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(ChillingTimerHandle, this, &UShootingComponent::RestartChillingWeapon, WeaponChillingDelay, false);
+		return;
+	}
+
+	float DeltaTime = GetWorld()->GetDeltaSeconds();
+	float ChillingWeaponHeat = FMath::Clamp(WeaponHeatLevel - WeaponChillingMultiplier * DeltaTime, 0.f, WeaponHeatLimit);
+	WeaponHeatLevel = FMath::FInterpTo(WeaponHeatLevel, ChillingWeaponHeat, DeltaTime, 4.5f);
+}
+
+void UShootingComponent::RestartChillingWeapon()
+{
+	WeaponHeatLevel -= .1f;
+}
+
 
 void UShootingComponent::SetCameraComponent(UCameraComponent* CameraComponent)
 {
@@ -74,8 +93,12 @@ void UShootingComponent::StopFire()
 void UShootingComponent::HandleFire_Implementation()
 {
 
-	//TODO: Return if the projectile will overheat a weapon
-	//if (!(WeaponHeatLevel + CurrentWeaponHeatAmount <= WeaponHeatLimit)) return;
+	//Return if the projectile will overheat a weapon
+	if (!(WeaponHeatLevel + CurrentWeaponHeatAmount <= WeaponHeatLimit)) 
+	{
+		WeaponHeatLevel = WeaponHeatLimit;
+		return;
+	}
 
 	//Get Spawn Properties
 	if (!ensure(CameraComp != nullptr)) return;
@@ -106,15 +129,14 @@ void UShootingComponent::HandleFire_Implementation()
 	////Spawn Projectile Object
 	/*static ConstructorHelpers::FClassFinder<AProjectileBase> Projectile(TEXT("/Game/Projectile/BP_Projectile.BP_Projectile"));
 	auto projectileClass = Projectile.Class;*/
+
 	if (ProjectileClass != nullptr) {
 		AProjectileBase* Projectile = GetWorld()->SpawnActor<AProjectileBase>(ProjectileClass, SpawnPoint, ProjectileRotation);
 		Projectile->SetOwner(GetOwner());
+		CurrentWeaponHeatAmount = Projectile->ProjectileHeatAmount;
 	}
 
-
-	//TODO: Increase heat amount on the weapon
-	//CurrentWeaponHeatAmount = spawnedProjectile->ProjectileHeatAmount;
-	//WeaponHeatLevel += CurrentWeaponHeatAmount;
+	WeaponHeatLevel += CurrentWeaponHeatAmount;
 }
 
 void UShootingComponent::HandleFireRafale_Implementation() {
@@ -144,11 +166,7 @@ void UShootingComponent::HandleFireRafale_Implementation() {
 	spawnParameters.Instigator = GetOwner()->GetInstigator();
 	spawnParameters.Owner = GetOwner();
 
-
-
 	////Spawn Projectile Object
-	/*static ConstructorHelpers::FClassFinder<AProjectileBase> Projectile(TEXT("/Game/Projectile/BP_Projectile.BP_Projectile"));
-	auto projectileClass = Projectile.Class;*/
 
 	if (ProjectileClass != nullptr) {
 		AProjectileBase* Projectile = GetWorld()->SpawnActor<AProjectileBase>(ProjectileClass, SpawnPoint, ProjectileRotation);

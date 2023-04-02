@@ -22,7 +22,7 @@ void UShipReplicator::BeginPlay()
 
 	MovementComponent = GetOwner()->FindComponentByClass<UShipMovement>();
 	HealthComponent = GetOwner()->FindComponentByClass<UHealthComponent>();
-	
+	ShootingComponent = GetOwner()->FindComponentByClass<UShootingComponent>();
 }
 
 
@@ -64,11 +64,12 @@ void UShipReplicator::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 /// </summary>
 void UShipReplicator::OnRep_ServerState()
 {
-	if (MovementComponent == nullptr || HealthComponent == nullptr) return;
+	if (MovementComponent == nullptr || HealthComponent == nullptr || ShootingComponent == nullptr) return;
 
 	GetOwner()->SetActorTransform(ServerState._Transform);
 	HealthComponent->SetCurrentHealth(ServerState._Health);
 	HealthComponent->SetCurrentShield(ServerState._Shield);
+	ShootingComponent->SetWeaponHeatLevel(ServerState._WeaponHeatLevel);
 
 	ClearAcknolegedMoves(ServerState._LastMove);
 
@@ -84,7 +85,7 @@ void UShipReplicator::OnRep_ServerState()
 /// <param name="Move"></param>
 void UShipReplicator::Server_SendMove_Implementation(FShipMove Move)
 {
-	if (MovementComponent == nullptr || HealthComponent == nullptr) return;
+	if (MovementComponent == nullptr || HealthComponent == nullptr || ShootingComponent == nullptr) return;
 
 	MovementComponent->SimulateMove(Move);
 
@@ -92,6 +93,7 @@ void UShipReplicator::Server_SendMove_Implementation(FShipMove Move)
 	ServerState._Transform = GetOwner()->GetActorTransform();
 	ServerState._Health = HealthComponent->GetCurrentHealth();
 	ServerState._Shield = HealthComponent->GetCurrentShield();
+	ServerState._WeaponHeatLevel = ShootingComponent->GetCurrentHeat();
 
 }
 

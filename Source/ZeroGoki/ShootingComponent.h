@@ -47,7 +47,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Combat")
 		float CurrentWeaponHeatAmount;
 
-	UPROPERTY(EditAnywhere, Category = "Combat")
+	UPROPERTY(EditAnywhere, Category = "Combat", ReplicatedUsing = OnRep_WeaponHeatLevel)
 		float WeaponHeatLevel;
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
@@ -70,12 +70,17 @@ protected:
 
 	class UCameraComponent* CameraComp;
 
+	FTimerHandle ChillingTimerHandle;
+
 	/** Server function for spawning projectiles.*/
 	UFUNCTION(Server, Reliable)
 		void HandleFire();
 
 	UFUNCTION(Server, Reliable)
 		void HandleFireRafale();
+
+	UFUNCTION()
+		void OnRep_WeaponHeatLevel();
 
 	/** A timer handle used for providing the fire rate delay in-between spawns.*/
 	FTimerHandle FiringTimer;
@@ -86,9 +91,11 @@ public:
 
 	void WeaponChillDown();
 
-	void RestartChillingWeapon();
-
 	void SetCameraComponent(UCameraComponent* CameraComponent);
+
+	void SetWeaponHeatLevel(float value);
+	void OnHeatLevelUpdate();
+
 
 #pragma region Combat
 

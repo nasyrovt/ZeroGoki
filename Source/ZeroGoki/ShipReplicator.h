@@ -4,8 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+
 #include "ShipMovement.h"
 #include "HealthComponent.h"
+#include "ShootingComponent.h"
+
 #include "ShipReplicator.generated.h"
 
 
@@ -23,6 +26,9 @@ struct FShipState
 
 	UPROPERTY()
 		float _Shield;
+
+	UPROPERTY()
+		float _WeaponHeatLevel;
 
 	UPROPERTY()
 		FTransform _Transform;
@@ -64,4 +70,6 @@ private:
 		UShipMovement* MovementComponent;
 	UPROPERTY()
 		UHealthComponent* HealthComponent;
+	UPROPERTY()
+		UShootingComponent* ShootingComponent;
 };

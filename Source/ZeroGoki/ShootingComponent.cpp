@@ -4,7 +4,9 @@
 #include "ShootingComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include <Net/UnrealNetwork.h>
 #include "SpaceShip.h"
+
 
 // Sets default values for this component's properties
 UShootingComponent::UShootingComponent()
@@ -38,23 +40,44 @@ void UShootingComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 	WeaponChillDown();
 }
 
-void UShootingComponent::WeaponChillDown()
+void UShootingComponent::GetLifetimeReplicatedProps(TArray <FLifetimeProperty>& OutLifetimeProps) const
 {
-	if (WeaponHeatLevel == WeaponHeatLimit)
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(UShootingComponent, WeaponHeatLevel);
+}
+
+void UShootingComponent::SetWeaponHeatLevel(float value)
+{
+	WeaponHeatLevel = value;
+	OnHeatLevelUpdate();
+}
+
+void UShootingComponent::OnHeatLevelUpdate()
+{
+	//Client-specific functionality
+	if (Cast<APawn>(GetOwner())->IsLocallyControlled())
 	{
-		FTimerHandle ChillingTimerHandle;
-		GetWorld()->GetTimerManager().SetTimer(ChillingTimerHandle, this, &UShootingComponent::RestartChillingWeapon, WeaponChillingDelay, false);
-		return;
+		
 	}
 
+	//Server-specific functionality
+	if (GetOwner()->GetLocalRole() == ROLE_Authority)
+	{
+		
+	}
+
+	//Functions that occur on all machines. 
+	
+	
+}
+
+void UShootingComponent::WeaponChillDown() 
+{
+	
 	float DeltaTime = GetWorld()->GetDeltaSeconds();
 	float ChillingWeaponHeat = FMath::Clamp(WeaponHeatLevel - WeaponChillingMultiplier * DeltaTime, 0.f, WeaponHeatLimit);
 	WeaponHeatLevel = FMath::FInterpTo(WeaponHeatLevel, ChillingWeaponHeat, DeltaTime, 4.5f);
-}
-
-void UShootingComponent::RestartChillingWeapon()
-{
-	WeaponHeatLevel -= .1f;
 }
 
 
@@ -85,6 +108,11 @@ void UShootingComponent::StartFire()
 	}
 }
 
+void UShootingComponent::OnRep_WeaponHeatLevel() 
+{
+	OnHeatLevelUpdate();
+}
+
 void UShootingComponent::StopFire()
 {
 	bIsFiringWeapon = false;
@@ -96,7 +124,7 @@ void UShootingComponent::HandleFire_Implementation()
 	//Return if the projectile will overheat a weapon
 	if (!(WeaponHeatLevel + CurrentWeaponHeatAmount <= WeaponHeatLimit)) 
 	{
-		WeaponHeatLevel = WeaponHeatLimit;
+		SetWeaponHeatLevel(WeaponHeatLimit);
 		return;
 	}
 

@@ -61,8 +61,11 @@ void UHealthComponent::OnHealthUpdate()
 	}
 
 	//Functions that occur on all machines. 
-	if (CurrentHealth <= 0) {
-		GetOwner()->Destroy();
+	if (CurrentHealth <= 0) 
+	{
+		//GetOwner()->Destroy();
+		
+
 	}
 }
 
@@ -102,7 +105,7 @@ void UHealthComponent::OnShieldUpdate()
 
 	//Functions that occur on all machines. 
 	if (CurrentHealth <= 0) {
-		GetOwner()->Destroy();
+		//GetOwner()->Destroy();
 	}
 }
 

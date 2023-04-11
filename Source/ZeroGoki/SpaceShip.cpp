@@ -2,6 +2,7 @@
 
 
 #include "SpaceShip.h"
+#include "ZeroGokiPlayerState.h"
 
 // Constructor
 ASpaceShip::ASpaceShip()
@@ -73,9 +74,30 @@ void ASpaceShip::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 float ASpaceShip::TakeDamage(float DamageTaken, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	if (HealthComponent == nullptr) return 0.f;
-	float damageApplied = HealthComponent->GetCurrentHealth() - DamageTaken;
-	HealthComponent->SetCurrentHealth(damageApplied);
-	return damageApplied;
+	float damageAfterShield = HealthComponent->GetCurrentShield() - DamageTaken;
+	if (damageAfterShield >= 0.f)
+	{
+		HealthComponent->SetCurrentShield(damageAfterShield);
+		return damageAfterShield;
+	}
+	else
+	{
+		float damageToHealth = HealthComponent->GetCurrentHealth() + damageAfterShield;
+		HealthComponent->SetCurrentHealth(damageToHealth);
+
+		if (damageToHealth <= 0.f)
+		{
+			AZeroGokiPlayerState* CauserPlayerState = EventInstigator ? Cast<AZeroGokiPlayerState>(EventInstigator->PlayerState) : nullptr;
+
+			if (CauserPlayerState != nullptr)
+			{
+				// Update the player state's Kills property
+				CauserPlayerState->AddKill();
+			}
+		}
+		return damageToHealth;
+	}
+	
 }
 
 void ASpaceShip::PitchRotation(float Value)

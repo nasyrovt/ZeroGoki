@@ -169,6 +169,13 @@ void UShootingComponent::HandleFire_Implementation()
 
 void UShootingComponent::HandleFireRafale_Implementation() {
 
+	//Return if the projectile will overheat a weapon
+	if (!(WeaponHeatLevel + CurrentWeaponHeatAmount <= WeaponHeatLimit))
+	{
+		SetWeaponHeatLevel(WeaponHeatLimit);
+		return;
+	}
+
 	if (!ensure(CameraComp != nullptr)) return;
 
 	FVector Start = CameraComp->GetComponentLocation();
@@ -199,11 +206,13 @@ void UShootingComponent::HandleFireRafale_Implementation() {
 	if (ProjectileClass != nullptr) {
 		AProjectileBase* Projectile = GetWorld()->SpawnActor<AProjectileBase>(ProjectileClass, SpawnPoint, ProjectileRotation);
 		Projectile->SetOwner(GetOwner());
+		CurrentWeaponHeatAmount = Projectile->ProjectileHeatAmount;
 	}
 	nbProjectile++;
 	if (nbProjectile == 3) {
 		UWorld* World = GetWorld();
 		World->GetTimerManager().ClearTimer(FiringTimer);
+		WeaponHeatLevel += CurrentWeaponHeatAmount;
 		nbProjectile = 0;
 		StopFire();
 	}

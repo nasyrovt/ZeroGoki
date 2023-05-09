@@ -60,5 +60,5 @@ void ALobbyGameMode::HandleStartGame()
 
 	if (!ensure(World != nullptr)) return;
 
-	World->ServerTravel("/Game/Maps/DeathMatch?listen");
+	World->ServerTravel("/Game/Maps/space?listen");
 }

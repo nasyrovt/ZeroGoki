@@ -18,7 +18,7 @@ void ALobbyGameMode::PostLogin(APlayerController * PlayerController)
 	NumberOfPlayers++;
 
 	bUseSeamlessTravel = true;
-	if (NumberOfPlayers == 3) {
+	if (NumberOfPlayers == 2) {
 		
 		GetWorldTimerManager().SetTimer(
 			GameStartTimerHandle, 

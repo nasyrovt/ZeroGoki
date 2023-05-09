@@ -107,11 +107,12 @@ void USpaceBattleGameInstance::CreateSession()
 	{
 		FOnlineSessionSettings SessionSettings;
 
-		if (IOnlineSubsystem::Get()->GetSubsystemName() == "NULL")
-			SessionSettings.bIsLANMatch = true; //For local testing
-		else
-			SessionSettings.bIsLANMatch = false;
+		//if (IOnlineSubsystem::Get()->GetSubsystemName() == "NULL")
 
+		//	SessionSettings.bIsLANMatch = true; //For local testing
+		//else
+		SessionSettings.bIsLANMatch = false;
+		SessionSettings.bUseLobbiesIfAvailable = true;
 		SessionSettings.NumPublicConnections = 5;
 		SessionSettings.bShouldAdvertise = true; //Lets Session be Public
 		SessionSettings.bUsesPresence = true;
